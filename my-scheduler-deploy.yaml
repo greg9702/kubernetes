@@ -4,46 +4,6 @@ metadata:
   name: my-scheduler
   namespace: kube-system
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: my-scheduler-as-kube-scheduler
-subjects:
-- kind: ServiceAccount
-  name: my-scheduler
-  namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: system:kube-scheduler
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: my-scheduler-as-volume-scheduler
-subjects:
-- kind: ServiceAccount
-  name: my-scheduler
-  namespace: kube-system
-roleRef:
-  kind: ClusterRole
-  name: system:volume-scheduler
-  apiGroup: rbac.authorization.k8s.io
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-scheduler-config
-  namespace: kube-system
-data:
-  my-scheduler-config.yaml: |
-    apiVersion: kubescheduler.config.k8s.io/v1beta2
-    kind: KubeSchedulerConfiguration
-    profiles:
-      - schedulerName: my-scheduler
-    leaderElection:
-      leaderElect: false    
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -69,8 +29,10 @@ spec:
       containers:
       - command:
         - /usr/local/bin/kube-scheduler
-        - --config=/etc/kubernetes/my-scheduler/my-scheduler-config.yaml
-        image:  nieźle mnie rozśmieszył. Taki kozak bogaty a płaszczy się do jakiejś wielkomiejskiej p0lki jak kunmy-kube-scheduler:1.0
+        - --authentication-kubeconfig=/etc/kubernetes/scheduler.conf
+        - --authorization-kubeconfig=/etc/kubernetes/scheduler.conf
+        - --kubeconfig=/etc/kubernetes/scheduler.conf
+        image: my-kube-scheduler:1.0
         livenessProbe:
           httpGet:
             path: /healthz
@@ -89,11 +51,13 @@ spec:
         securityContext:
           privileged: false
         volumeMounts:
-          - name: config-volume
-            mountPath: /etc/kubernetes/my-scheduler
+        - name: kubeconfig
+          mountPath: /etc/kubernetes/scheduler.conf
+          readOnly: true
       hostNetwork: false
       hostPID: false
       volumes:
-        - name: config-volume
-          configMap:
-            name: my-scheduler-config
+      - hostPath:
+          path: /etc/kubernetes/scheduler.conf
+          type: FileOrCreate
+        name: kubeconfig
