@@ -30,6 +30,14 @@ data:
       - schedulerName: my-scheduler
     leaderElection:
       leaderElect: false
+    extenders:
+      - urlPrefix: http://localhost/scheduler
+        filterVerb: predicates/always_true
+        prioritizeVerb: priorities/zero_score
+        enableHTTPS: true
+        preemptVerb: preemption
+        weight: 1
+        nodeCacheCapable: false
 ---
 apiVersion: apps/v1
 kind: Deployment
