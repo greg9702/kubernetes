@@ -13,6 +13,6 @@ docker build -t $IMAGE_NAME:$IMAGE_TAG .
 echo ================================================  LOADING IMAGE  ================================================
 kind load docker-image $IMAGE_NAME:$IMAGE_TAG
 echo =============================================== RUNNING SCHEDULER ===============================================
-kubectl delete -f $SCHEDULER_DEPLOYMENT_FILE
+kubectl delete -f $SCHEDULER_DEPLOYMENT_FILE || true
 kubectl apply -f $SCHEDULER_DEPLOYMENT_FILE
 echo =================================================== COMPLETED ===================================================

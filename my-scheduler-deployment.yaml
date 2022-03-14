@@ -31,9 +31,8 @@ data:
     leaderElection:
       leaderElect: false
     extenders:
-      - urlPrefix: http://localhost/scheduler
+      - urlPrefix: http://opa-scheduler-extender-service/scheduler
         filterVerb: predicates/always_true
-        prioritizeVerb: priorities/zero_score
         enableHTTPS: true
         preemptVerb: preemption
         weight: 1
