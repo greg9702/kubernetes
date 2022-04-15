@@ -31,8 +31,8 @@ data:
     leaderElection:
       leaderElect: false
     extenders:
-      - urlPrefix: http://opa-scheduler-extender-service/scheduler
-        filterVerb: predicates/always_true
+      - urlPrefix: http://opa-scheduler-extender-service/v1/scheduler
+        filterVerb: opa/filter
         enableHTTPS: true
         preemptVerb: preemption
         weight: 1
